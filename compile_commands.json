@@ -1,0 +1,12 @@
+[
+  {
+    "directory": ".",
+    "file": "trust-filter.c",
+    "command": "clang -o trust-filter.bpf.o -c trust-filter.bpf.c -target bpf -g -O2 -std=gnu17 -Wall -Wextra -Wno-missing-declarations -Wno-unused-parameter"
+  },
+  {
+    "directory": ".",
+    "file": "trust-filter.bpf.c",
+    "command": "gcc -o trust-filter.o -c trust-filter.c -g -O2 -std=c23 -Wall -Wextra -lbpf"
+  }
+]

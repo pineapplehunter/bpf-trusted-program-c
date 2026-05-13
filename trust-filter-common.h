@@ -8,5 +8,5 @@ struct event {
   __u32 pid;
   __s32 xattr_len;
   char filename[128];
-  char xattr_value[64];
+  char xattr_value[128];
 };

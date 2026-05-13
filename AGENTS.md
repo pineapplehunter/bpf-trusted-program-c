@@ -1,14 +1,14 @@
 # BPF Trusted Program (C)
 
 eBPF LSM program using libbpf that hooks `SEC("lsm.s/bprm_creds_from_file")`
-to log executed binaries and their `security.bpf.trust` xattr via ring buffer.
+to log executed binaries and their `user.trust` xattr via ring buffer.
 
 ## Architecture
 
 - `trust-filter.bpf.c` — eBPF program (runs in kernel). Uses
   `SEC("lsm.s/bprm_creds_from_file")` to intercept `execve()`. Reads
   `linux_binprm->filename` for the binary path, then calls
-  `bpf_get_file_xattr(file, "security.bpf.trust", ...)` via kfunc and sends
+  `bpf_get_file_xattr(file, "user.trust", ...)` via kfunc and sends
   result to userspace through a ring buffer map.
 - `trust-filter.c` — Userspace loader. Opens the compiled BPF `.o`,
   loads it via libbpf, attaches via BTF, polls the ring buffer for events.

@@ -12,37 +12,75 @@ make
 
 ## Run
 
-The kernel must have BPF LSM enabled and BTF available.
+### Prerequisites
 
-**Check prerequisites:**
+The kernel must have BPF LSM enabled with **both** of these checks passing:
 
 ```sh
-cat /sys/kernel/security/lsm      # must include "bpf"
-ls /sys/kernel/btf/vmlinux        # must exist
+cat /sys/kernel/security/lsm        # must include "bpf"
+ls /sys/kernel/btf/vmlinux          # must exist (BTF)
 ```
 
-If `bpf` is missing from the LSM list, add `lsm=bpf` to the kernel command
-line and reboot.
+If `bpf` is missing, check whether your kernel has BPF LSM compiled in:
 
-**Start the loader:**
+```sh
+zgrep CONFIG_BPF_LSM /proc/config.gz
+```
+
+Common distributions that ship with `CONFIG_BPF_LSM=y`:
+- Ubuntu 23.04+ (but needs boot parameter)
+- Fedora 38+
+- Arch Linux
+- NixOS (with `boot.kernelParams = [ "lsm=bpf" ]`)
+
+**To enable BPF LSM on Ubuntu/Debian:**
+
+modify the grub config in `/etc/default/grub`
+
+```
+...
+GRUB_CMDLINE_LINUX="lsm=lockdown,capability,landlock,yama,apparmor,ima,evm,bpf"
+...
+```
+
+And update grub.
+
+```sh
+# Add lsm=bpf to kernel cmdline
+sudo update-grub
+sudo reboot
+# Verify after reboot:
+cat /sys/kernel/security/lsm
+```
+
+### Start the loader
 
 ```sh
 sudo ./trust-filter ./trust-filter.bpf.o
 ```
 
-The loader prints events via stdout. To test, set the `security.bpf.trust`
-xattr on a binary in another terminal:
+The loader prints events to stdout. In another terminal, set the
+`user.trust` xattr on a binary to test:
 
 ```sh
-sudo setfattr -n security.bpf.trust -v "trusted" /usr/bin/touch
+setfattr -n user.trust -v "trusted" /usr/bin/touch
 touch /tmp/test
 ```
 
-The loader will print:
+Expected output:
 
 ```
 Exec: "/usr/bin/touch" trust="trusted"
 Exec: "/usr/bin/ls" (no xattr)
+```
+
+The xattr name `user.trust` is the only xattr this program reads.
+Setting it marks the binary as "trusted" by the BPF LSM policy.
+
+### Read the xattr directly
+
+```sh
+getfattr -n user.trust /usr/bin/touch
 ```
 
 ## NixOS
@@ -58,12 +96,13 @@ nix develop -c make run
 | `make` | Build eBPF + userspace |
 | `make run` | `sudo ./trust-filter ./trust-filter.bpf.o` |
 | `make clean` | Remove build artifacts |
+| `bpftool btf dump ...` | Regenerate `vmlinux.h` |
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `trust-filter.bpf.c` | eBPF program — hooks `bprm_creds_from_file` |
-| `trust-filter.c` | Userspace loader — loads BPF, reads ring buffer |
+| `trust-filter.bpf.c` | eBPF program — hooks `SEC("lsm.s/bprm_creds_from_file")` |
+| `trust-filter.c` | Userspace loader — loads BPF, polls ring buffer |
 | `vmlinux.h` | Kernel BTF type definitions |
 | `Makefile` | Build rules |

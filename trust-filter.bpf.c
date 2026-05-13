@@ -10,6 +10,8 @@ char LICENSE[] SEC("license") = "GPL";
 #define ENODATA 61
 #endif
 
+#define TRUST_ATTR_NAME "user.trust"
+
 struct {
   __uint(type, BPF_MAP_TYPE_RINGBUF);
   __uint(max_entries, 1 << 10);
@@ -45,7 +47,7 @@ int BPF_PROG(bprm_creds_from_file, struct linux_binprm *bprm,
   }
 
   bpf_dynptr_from_mem(xattr_buf, sizeof(xattr_buf), 0, &dynptr);
-  ret = bpf_get_file_xattr(file, "user.my", &dynptr);
+  ret = bpf_get_file_xattr(file, TRUST_ATTR_NAME, &dynptr);
   if (ret > 0) {
     if (ret >= (long)sizeof(xattr_buf))
       ret = sizeof(xattr_buf) - 1;

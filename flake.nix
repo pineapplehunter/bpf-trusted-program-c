@@ -40,17 +40,18 @@
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
-              libbpf
-              pkg-config
               bpftools
-              llvmPackages.bintools
+              glibc
+              libbpf
               libelf
-              zlib
+              llvmPackages.bintools
               llvmPackages.clang-unwrapped
+              pkg-config
+              clang-tools
             ];
-            env.CLANGD_FLAGS =
+            env.CPATH =
               with pkgs;
-              "-I${lib.makeIncludePath [
+              "${lib.makeIncludePath [
                 clang
                 glibc
                 libbpf
