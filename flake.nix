@@ -13,7 +13,12 @@
       ];
 
       perSystem =
-        { pkgs, system, ... }:
+        {
+          pkgs,
+          system,
+          lib,
+          ...
+        }:
         {
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
@@ -42,9 +47,17 @@
               pkg-config
               bpftools
               llvmPackages.bintools
+              libelf
+              zlib
             ];
             CLANG = "${pkgs.llvmPackages.clang-unwrapped}/bin/clang";
             SHELL = "${pkgs.bash}/bin/bash";
+            C_INCLUDE_PATH = "${lib.makeIncludePath [
+              pkgs.clang
+              pkgs.libgcc
+              pkgs.glibc
+              pkgs.libbpf
+            ]}";
           };
 
           formatter = pkgs.nixfmt-tree;

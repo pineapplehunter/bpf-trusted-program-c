@@ -1,0 +1,7 @@
+If:
+  PathMatch: .*.bpf.c
+
+CompileFlags:
+  Add:
+    - -target
+    - bpf
