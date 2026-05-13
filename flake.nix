@@ -40,21 +40,16 @@
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
-              clang
-              cmake
               libbpf
-              ninja
               pkg-config
               bpftools
               llvmPackages.bintools
               libelf
               zlib
+              llvmPackages.clang-unwrapped
             ];
-            CLANG = "${pkgs.llvmPackages.clang-unwrapped}/bin/clang";
-            SHELL = "${pkgs.bash}/bin/bash";
             C_INCLUDE_PATH = "${lib.makeIncludePath [
               pkgs.clang
-              pkgs.libgcc
               pkgs.glibc
               pkgs.libbpf
             ]}";

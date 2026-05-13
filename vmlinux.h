@@ -138137,6 +138137,7 @@ extern int bpf_strchrnul(const char *s__ign, char c) __weak __ksym;
 extern int bpf_strcmp(const char *s1__ign, const char *s2__ign) __weak __ksym;
 extern int bpf_strcspn(const char *s__ign, const char *reject__ign) __weak __ksym;
 extern int bpf_stream_print_stack(int stream_id) __weak __ksym;
+extern int bpf_stream_vprintk(int stream_id, const char *fmt__str, const void *args, u32 len__sz) __weak __ksym;
 extern int bpf_strlen(const char *s__ign) __weak __ksym;
 extern int bpf_strncasecmp(const char *s1__ign, const char *s2__ign, size_t len) __weak __ksym;
 extern int bpf_strncasestr(const char *s1__ign, const char *s2__ign, size_t len) __weak __ksym;

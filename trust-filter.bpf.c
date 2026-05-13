@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: GPL-2.0
 #include "trust-filter-common.h"
 #include "vmlinux.h"
 #include <bpf/bpf_core_read.h>

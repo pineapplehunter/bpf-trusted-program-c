@@ -18,10 +18,10 @@ binaries and their inode security xattrs.
 
 | Command | What |
 |---------|------|
-| `cmake -B build && cmake --build build` | Build eBPF + userspace |
-| `cmake --build build --target run` | `sudo ./build/trust-filter ./build/trust-filter.bpf.o` |
-| `rm -rf build` | Remove build artifacts |
-| `nix develop` | Dev shell with cmake, clang, libbpf, ninja |
+| `make` / `make all` | Build eBPF + userspace |
+| `make run` | `sudo ./trust-filter ./trust-filter.bpf.o` |
+| `make clean` | Remove build artifacts |
+| `nix develop` | Dev shell with clang, libbpf, bpftool |
 
 ## Runtime Requirements
 

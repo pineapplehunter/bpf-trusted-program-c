@@ -1,4 +1,6 @@
 /.direnv
 result*
 /.cache
-/build
+trust-filter
+*.o
+vmlinux.h

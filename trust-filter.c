@@ -10,15 +10,20 @@
 
 static volatile sig_atomic_t exiting = 0;
 
-static void sig_handler(int sig) { exiting = 1; }
+static void sig_handler(int sig) {
+  (void)sig;
+  exiting = 1;
+}
 
 static int handle_event(void *ctx, void *data, size_t size) {
+  (void)ctx;
+  (void)size;
   struct event *e = data;
 
   if (e->xattr_len > 0) {
-    printf(" Exec: \"%s\" trust=\"%s\"\n", e->filename, e->xattr_value);
+    printf("TExec: \"%s\" trust=\"%s\"\n", e->filename, e->xattr_value);
   } else {
-    printf("TExec: \"%s\" (%s)\n", e->filename, strerror(-e->xattr_len));
+    printf(" Exec: \"%s\" (%s)\n", e->filename, strerror(-e->xattr_len));
   }
   fflush(stdout);
   return 0;
