@@ -1,7 +1,7 @@
 BPF_CC ?= clang
 CC ?= gcc
 PKG_CONFIG ?= pkg-config
-CFLAGS ?= -g -O2 -std=c23 -Wall -Wextra -lbpf
+CFLAGS ?= -g -O2 -std=c23 -Wall -Wextra $(shell pkg-config --cflags --libs libbpf)
 BPF_CFLAGS ?= -g -O2 -std=gnu17 -Wall -Wextra -Wno-missing-declarations -Wno-unused-parameter $(shell pkg-config --cflags libbpf)
 
 COMMON_FILES = trust-filter-common.h
