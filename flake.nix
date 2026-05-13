@@ -48,11 +48,14 @@
               zlib
               llvmPackages.clang-unwrapped
             ];
-            C_INCLUDE_PATH = "${lib.makeIncludePath [
-              pkgs.clang
-              pkgs.glibc
-              pkgs.libbpf
-            ]}";
+            env.CLANGD_FLAGS =
+              with pkgs;
+              "-I${lib.makeIncludePath [
+                clang
+                glibc
+                libbpf
+                linuxHeaders
+              ]}";
           };
 
           formatter = pkgs.nixfmt-tree;
