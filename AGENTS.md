@@ -1,16 +1,17 @@
 # BPF Trusted Program (C)
 
-eBPF LSM program using libbpf that hooks `bprm_check_security` to log executed
-binaries and their inode security xattrs.
+eBPF LSM program using libbpf that hooks `SEC("lsm.s/bprm_creds_from_file")`
+to log executed binaries and their `security.bpf.trust` xattr via ring buffer.
 
 ## Architecture
 
 - `trust-filter.bpf.c` — eBPF program (runs in kernel). Uses
-  `SEC("lsm/bprm_check_security")` to intercept `execve()`. Reads
-  `linux_binprm->filename` for the binary path and traverses `file->f_inode->i_security`
-  to dump the first 8 bytes of the security blob.
+  `SEC("lsm.s/bprm_creds_from_file")` to intercept `execve()`. Reads
+  `linux_binprm->filename` for the binary path, then calls
+  `bpf_get_file_xattr(file, "security.bpf.trust", ...)` via kfunc and sends
+  result to userspace through a ring buffer map.
 - `trust-filter.c` — Userspace loader. Opens the compiled BPF `.o`,
-  loads it via libbpf, attaches via BTF, waits for Ctrl+C.
+  loads it via libbpf, attaches via BTF, polls the ring buffer for events.
 - `vmlinux.h` — CO-RE kernel type definitions. Regenerate with
   `bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h`.
 
@@ -32,11 +33,8 @@ binaries and their inode security xattrs.
 
 ## vmlinux.h
 
-The provided `vmlinux.h` contains minimal struct definitions used by the BPF
-program. CO-RE relocations resolve field offsets at load time, so the
-definitions only need correct field names — not exact layout.
+The provided `vmlinux.h` contains full kernel BTF types. To regenerate:
 
-To regenerate the full `vmlinux.h`:
 ```
 bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h
 ```
