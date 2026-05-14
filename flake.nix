@@ -59,6 +59,11 @@
               ]}";
           };
 
+          packages = {
+            trust-filter = pkgs.callPackage ./package.nix { };
+            default = pkgs.callPackage ./package.nix { };
+          };
+
           formatter = pkgs.nixfmt-tree;
         };
     };
