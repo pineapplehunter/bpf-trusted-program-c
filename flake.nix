@@ -13,31 +13,8 @@
       ];
 
       perSystem =
+        { pkgs, lib, ... }:
         {
-          pkgs,
-          system,
-          lib,
-          ...
-        }:
-        {
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            overlays = [
-              (final: prev: {
-                libbpf = prev.libbpf.overrideAttrs {
-                  version = "1.7.0";
-                  src = final.fetchFromGitHub {
-                    owner = "libbpf";
-                    repo = "libbpf";
-                    tag = "v1.7.0";
-                    hash = "sha256-F92msxkYp4yZA3qUoSwS5GKUhcEO6DrYNln7w6U+jt0=";
-                  };
-                  patches = [ ];
-                };
-              })
-            ];
-          };
-
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               bpftools
